@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Lore — Founder Context Autofill",
+  "version": "0.2.0",
+  "description": "Draft accelerator application answers from your own verified founder context. BYOK: bring your own LLM API key.",
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting", "sidePanel", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Lore — open panel"
+  }
+}

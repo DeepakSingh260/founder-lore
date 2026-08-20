@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lore — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <h1>Lore settings</h1>
+
+    <section>
+      <h2>LLM provider (BYOK)</h2>
+      <p class="muted">Your key is stored locally in this browser profile and sent only to the provider you pick. Questions and the context slices needed to answer them are sent to that provider on each draft.</p>
+
+      <label for="provider">Provider</label>
+      <select id="provider"></select>
+
+      <label for="apiKey">API key <a id="keyLink" href="#" target="_blank" hidden>get a key</a></label>
+      <input type="password" id="apiKey" autocomplete="off" placeholder="sk-…">
+
+      <div id="baseUrlWrap" hidden>
+        <label for="baseUrl">Base URL (OpenAI-compatible, e.g. http://localhost:11434/v1)</label>
+        <input type="text" id="baseUrl" placeholder="https://…/v1">
+      </div>
+
+      <label for="model">Model</label>
+      <div class="row">
+        <select id="model"></select>
+        <button id="refreshModels" class="slim" title="Fetch the model list from your provider using your API key">↻ Fetch models</button>
+      </div>
+      <input type="text" id="modelCustom" placeholder="custom model id…" hidden>
+      <span id="modelStatus" class="status"></span>
+
+      <button id="saveSettings" class="primary">Save provider settings</button>
+      <span id="settingsStatus" class="status"></span>
+    </section>
+
+    <section>
+      <h2>Discover programs</h2>
+      <p class="muted">Lore re-checks accelerator and VC apply pages on a schedule (in your browser — no server) and flags newly opened applications with a <b>NEW</b> badge. Add any program page you want watched.</p>
+      <div class="row toolbar">
+        <label class="inline-check"><input type="checkbox" id="discoverEnabled" checked> Scan automatically</label>
+        <label class="inline-check">every
+          <select id="discoverInterval">
+            <option value="6">6 h</option>
+            <option value="12" selected>12 h</option>
+            <option value="24">24 h</option>
+          </select>
+        </label>
+        <button id="scanNow" class="slim">↻ Scan now</button>
+        <span id="discoverStatus" class="status"></span>
+      </div>
+      <div class="row">
+        <input type="url" id="customProgram" placeholder="https://someaccelerator.com/apply — add a page to watch">
+        <button id="addProgram" class="slim">+ Watch</button>
+      </div>
+      <div id="discoverList"></div>
+    </section>
+
+    <section>
+      <h2>Applications</h2>
+      <p class="muted">Every program you've applied to (or plan to). The side panel's <em>Save to history</em> adds entries here automatically. Notes are private — never sent to the LLM.</p>
+      <div id="appsSummary" class="apps-summary"></div>
+      <div id="appsList"></div>
+      <button id="addApp" class="slim">+ Add application</button>
+      <span id="appsStatus" class="status"></span>
+    </section>
+
+    <section>
+      <h2>Founder context</h2>
+      <p class="muted">This is the product: one portable file of verified facts about your company.
+        Fields with a <span class="chip">✓ verified</span> toggle are facts the extension checks every draft against — numbers the model may never alter.
+        List fields take one item per line.</p>
+
+      <div class="row toolbar">
+        <button id="uploadDeck" class="accent">📄 Upload pitch deck…</button>
+        <button id="importFile">Import JSON…</button>
+        <button id="exportFile">Export JSON</button>
+        <input type="file" id="filePicker" accept=".json,application/json" hidden>
+        <input type="file" id="deckPicker" accept=".pdf,application/pdf" hidden>
+      </div>
+      <p class="muted small-note">Pitch deck: the PDF is sent once to your selected provider/model, which proposes values for empty fields. Everything it extracts is marked <em>unverified</em> — review each field before relying on it.</p>
+      <span id="deckStatus" class="status"></span>
+
+      <nav id="stepNav" class="step-nav"></nav>
+
+      <div id="contextForm"></div>
+
+      <div class="row pager">
+        <button id="prevStep">← Back</button>
+        <span id="stepLabel" class="muted"></span>
+        <button id="nextStep">Next →</button>
+      </div>
+
+      <details id="advanced">
+        <summary>Advanced: raw JSON</summary>
+        <textarea id="contextEditor" rows="20" spellcheck="false"></textarea>
+        <button id="applyJson" class="slim">Apply JSON to form</button>
+      </details>
+
+      <button id="saveContext" class="primary">Save context</button>
+      <span id="contextStatus" class="status"></span>
+    </section>
+  </main>
+  <script src="options.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lore</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header>
+    <h1>Lore</h1>
+    <a href="#" id="openOptions">Settings</a>
+  </header>
+
+  <div id="pageBanner" class="banner" hidden>
+    <span id="bannerText"></span>
+    <div class="row banner-actions">
+      <button id="autofillPage" class="slim">⚡ Autofill page</button>
+      <button id="trackPage" class="slim">Track it</button>
+      <button id="markSubmitted" class="slim">Mark submitted</button>
+    </div>
+  </div>
+
+  <label for="question">Application question</label>
+  <textarea id="question" rows="3" placeholder="Paste the question, or select it on the page → right-click → “Draft answer with Lore”"></textarea>
+
+  <div class="row">
+    <label class="inline">Char limit
+      <input type="number" id="charLimit" min="0" placeholder="auto">
+    </label>
+    <label class="inline">Word limit
+      <input type="number" id="wordLimit" min="0" placeholder="auto">
+    </label>
+    <label class="inline">Program
+      <input type="text" id="program" list="programList" placeholder="e.g. YC W27">
+      <datalist id="programList"></datalist>
+    </label>
+  </div>
+
+  <details id="extraWrap">
+    <summary>Extra guidance for this answer (optional)</summary>
+    <textarea id="extra" rows="2" placeholder="e.g. emphasize the security angle · mention the October pilot · facts you add here count as verified"></textarea>
+  </details>
+
+  <button id="draft" class="primary">Draft answer</button>
+  <div id="status" class="status" hidden></div>
+
+  <section id="result" hidden>
+    <div class="answer-head">
+      <label for="answer">Answer</label>
+      <span id="charCount" class="muted"></span>
+    </div>
+    <textarea id="answer" rows="10"></textarea>
+
+    <div class="row refine-row">
+      <input type="text" id="refineInput" placeholder="Tell the AI what to change — shorter, mention X, less salesy…">
+      <button id="refine" title="Revise the draft above with your instruction. Facts and limits still enforced.">↻ Refine</button>
+    </div>
+
+    <div id="warnings" class="callout warn" hidden></div>
+    <div id="missing" class="callout missing" hidden></div>
+    <details id="usedPathsWrap">
+      <summary>Context used</summary>
+      <div id="usedPaths" class="muted mono"></div>
+    </details>
+
+    <div class="row">
+      <button id="copy">Copy</button>
+      <button id="insert">Insert into page</button>
+      <button id="saveHistory" title="Save this Q&A to your context so future drafts match your voice">Save to history</button>
+    </div>
+  </section>
+
+  <script src="sidepanel.js" type="module"></script>
+</body>
+</html>
