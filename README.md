@@ -111,12 +111,87 @@ lib/context-template.js  founder_context schema; facts as {value, verified, upda
 - Keys are per-provider in local storage — anyone with the browser profile can
   read them.
 
-## Install / develop
+## Getting started
 
-`chrome://extensions` → Developer mode → **Load unpacked** → this folder.
-A local mock provider (`scratchpad/mock_llm.py`, OpenAI-compatible on
-`localhost:8998`) lets you demo the full pipeline with no key — configure it via
-the "Custom" provider.
+**Requirements:** a Chromium browser (Chrome, Brave, Edge, Arc). No build step,
+no Node — the extension is plain JS. Optional: an LLM API key for AI drafting
+(everything else works without one).
+
+### 1 · Install the extension
+
+```bash
+git clone https://github.com/DeepakSingh260/founder-lore.git
+```
+
+1. Open `chrome://extensions`
+2. Toggle **Developer mode** (top right)
+3. Click **Load unpacked** → select the cloned `founder-lore` folder
+4. Pin **Lore** to the toolbar (puzzle-piece icon → 📌)
+
+### 2 · Connect a model (optional but recommended)
+
+Right-click the Lore icon → **Options**:
+
+1. Pick a provider — Anthropic, OpenAI, Gemini, OpenRouter, or any
+   OpenAI-compatible base URL (Ollama, LM Studio, vLLM…)
+2. Paste your API key — the model dropdown fills itself from your provider
+3. **Save provider settings**
+
+Your key stays in this browser profile and is sent only to the provider you
+picked. Skip this step entirely and Lore still does identity fills, saved-answer
+reuse, option matching, detection, and tracking — only novel prose drafting
+needs the key.
+
+### 3 · Build your founder context
+
+Still in Options, under **Founder context** — this file *is* the product:
+
+- Walk the step-by-step wizard (Company → Founders → Traction → …). Numbers have
+  a **✓ verified** toggle: tick it and no model may ever alter that value.
+- Or **📄 Upload pitch deck…** — your model proposes values for empty fields,
+  all marked unverified for your review.
+- Or **Import JSON** if you already have a `founder_context.json`.
+- **Export JSON** any time — the file is portable; keep it in a private repo.
+
+### 4 · Fill an application
+
+1. Open any accelerator/VC/grant application — Lore detects it (toolbar shows
+   **APP**, a pill appears on the page; works inside Airtable/Typeform/Google
+   Forms embeds)
+2. Hit **Autofill** on the pill — or focus any field and click **✨ Fill**
+3. Review: every answer is source-tagged (context / saved answer / AI draft);
+   unknown answers are *skipped*, never invented
+4. For long-form questions, open the side panel (click the Lore icon): draft,
+   set char/word limits (auto-detected from the question), add per-answer
+   guidance, **↻ Refine**, then **Insert into page** and **Save to history** —
+   saved answers autofill on every future application
+5. When you submit, Lore logs it in the **Applications** tracker automatically
+
+### Try it with no API key at all
+
+`dev/` ships a mock provider and a test application form:
+
+```bash
+python3 dev/mock_llm.py &                      # OpenAI-compatible mock on :8998
+python3 -m http.server 8787 --directory dev &  # serves the test form
+```
+
+Options → provider **Custom (OpenAI-compatible)** → base URL
+`http://localhost:8998/v1` → any string as the key → model `mock-claude-demo`.
+Then open `http://localhost:8787/test-form.html` and hit Autofill — the full
+pipeline runs (retrieval, mapping, fact-check, choices) with canned prose.
+
+### Safari
+
+The code is Safari-ready (the side panel falls back to a toolbar popup).
+Package it with Xcode:
+
+```bash
+xcrun safari-web-extension-converter /path/to/founder-lore --app-name Lore --macos-only
+```
+
+Run the generated app once, then Safari → Settings → Extensions → enable Lore
+(Develop menu → *Allow Unsigned Extensions* for local builds).
 
 ## Honest limits
 
