@@ -54,9 +54,17 @@ async function refreshBanner() {
     } catch { /* no content script on this page (chrome://, store, etc.) */ }
   }
   if (!activeScan?.isApplication && !activeScan?.submittedLogged) {
-    banner.hidden = true;
+    // Not detected — still offer the manual override so a heuristic miss
+    // never blocks filling a real application.
+    banner.hidden = false;
+    $("bannerText").textContent = "This page wasn't detected as a funding application.";
+    $("forceFill").hidden = false;
+    $("autofillPage").hidden = true;
+    $("trackPage").hidden = true;
+    $("markSubmitted").hidden = true;
     return;
   }
+  $("forceFill").hidden = true;
   banner.hidden = false;
   const { founderContext } = await chrome.storage.local.get("founderContext");
   const tracked = (founderContext?.applications || []).some((a) => {
@@ -77,6 +85,16 @@ async function refreshBanner() {
     if (!$("program").value) $("program").value = activeScan.program || "";
   }
 }
+
+$("forceFill").addEventListener("click", async () => {
+  try {
+    await chrome.tabs.sendMessage(activeTabId, { type: "FORCE_DETECT" });
+    setStatus("Treating this page as an application — autofill started.");
+    setTimeout(refreshBanner, 1500);
+  } catch {
+    setStatus("Could not reach the page — reload the tab and try again.", true);
+  }
+});
 
 $("autofillPage").addEventListener("click", async () => {
   try {

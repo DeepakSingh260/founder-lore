@@ -109,12 +109,16 @@
       (location.pathname + (window !== window.top ? " " + document.referrer : "")).toLowerCase());
     const catHits = Object.values(CATEGORIES).filter((words) => words.some((w) => text.includes(w))).length;
     const negHits = NEGATIVES.filter((w) => text.includes(w)).length;
+    // The page calling ITSELF an application (title / header region) is a
+    // strong signal — catches community/cohort forms with little startup vocab.
+    const titleHint = /(application|apply)/i.test((document.title || "") + " " + text.slice(0, 300));
 
-    const isApplication = hasForm && negHits < 2 && (
+    const isApplication = forced || (hasForm && negHits < 2 && (
       (platform && (catHits >= 1 || urlHint)) ||
       catHits >= 3 ||
-      (catHits >= 2 && (urlHint || formHost))
-    );
+      (catHits >= 2 && (urlHint || formHost || titleHint)) ||
+      (catHits >= 1 && formHost && titleHint)
+    ));
     return {
       isApplication,
       program: guessProgram(),
@@ -573,6 +577,7 @@
   let successSent = false;
   let detectedHere = false;   // this frame holds the application form
   let lastProgram = "";
+  let forced = false;         // user said "treat this page as an application"
 
   function reportScan(force = false) {
     // Iframes without any form elements never scan — keeps ad/widget frames silent.
@@ -587,7 +592,9 @@
     let dismissed = false;
     try { dismissed = sessionStorage.getItem("lore-dismissed") === "1"; } catch {}
     if (scan.isApplication && !dismissed) buildUI();
-    if (scan.successText && !successSent) {
+    // "Thank you for applying" only means SUBMITTED when the form is gone —
+    // some applications thank you in their intro text while still fillable.
+    if (scan.successText && !scan.isApplication && !successSent) {
       successSent = true;
       chrome.runtime.sendMessage({ type: "SUCCESS_TEXT", scan }).catch(() => {});
     }
@@ -622,6 +629,20 @@
   }
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg.type === "FORCE_DETECT") {
+      // User override: heuristics missed, but they say this IS an application.
+      // Handled by any frame that actually has form fields.
+      if (document.querySelector("textarea, input:not([type=hidden]), [contenteditable=true]")) {
+        forced = true;
+        detectedHere = true;
+        try { sessionStorage.removeItem("lore-dismissed"); } catch {}
+        buildUI();
+        reportScan(true);
+        autofillPage();
+        sendResponse({ ok: true });
+      }
+      return;
+    }
     if (msg.type === "START_AUTOFILL") {
       // Runs in the frame that actually holds the form (may be an embed iframe).
       if (detectedHere) {
