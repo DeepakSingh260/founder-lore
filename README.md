@@ -8,6 +8,15 @@ doesn't need one.
 
 > **Your context is the product. The LLM is interchangeable.**
 
+![Lore autofilling an accelerator application](docs/demo.gif)
+
+| Autofill on a real form | Side panel: draft · limits · refine |
+|---|---|
+| ![Autofill with source-coded answers and honest skips](docs/autofill.png) | ![Side panel with auto-detected char/word limits and the refine loop](docs/sidepanel.png) |
+
+<img src="docs/options.png" width="700" alt="Settings: program discovery, application tracker, context wizard">
+
+
 ## Core guarantees
 
 1. **Facts are never invented.** Numbers, names, URLs come from your context file
